@@ -7,6 +7,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,16 +18,20 @@ import java.util.logging.Logger;
 public class Server implements Runnable {
 
 	private Path path = null;
+	ArrayList<String> nouveauxFichiers;
+	ArrayList<String> fichiersSupprimés;
 
 	/**
 	 * Constructeur
 	 * 
 	 * @param pathfolder
-	 *            path du dossier espionné
+	 *            path du dossier à espionner
 	 */
 	public Server(String pathfolder) {
 		this.path = Paths.get(pathfolder);
 		System.out.println("Dossier " + pathfolder + " espionné : start");
+		this.nouveauxFichiers = new ArrayList<String>();
+		this.fichiersSupprimés = new ArrayList<String>();
 	}
 
 	/*
@@ -50,12 +55,15 @@ public class Server implements Runnable {
 				// traiter les evenements
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
 					String fileName = event.context().toString();
+					System.out.println(fileName);
 					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+						nouveauxFichiers.add(this.path+fileName);
 						System.out.println("new file create " + fileName);
 					} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
 						System.out.println(fileName + " has been modified");
 					} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
 						System.out.println(fileName + " has been deleted");
+						fichiersSupprimés.add(this.path+fileName);
 					} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 						System.out.println("Strange event");
 						continue;
@@ -75,6 +83,48 @@ public class Server implements Runnable {
 		} catch (Exception ex) {
 			Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public Path getPath() {
+		return path;
+	}
+
+	/**
+	 * @param path
+	 */
+	public void setPath(Path path) {
+		this.path = path;
+	}
+
+	/**
+	 * @return
+	 */
+	public ArrayList<String> getNouveauxFichiers() {
+		return nouveauxFichiers;
+	}
+
+	/**
+	 * @param nouveauxFichiers
+	 */
+	public void setNouveauxFichiers(ArrayList<String> nouveauxFichiers) {
+		this.nouveauxFichiers = nouveauxFichiers;
+	}
+
+	/**
+	 * @return
+	 */
+	public ArrayList<String> getFichiersSupprimés() {
+		return fichiersSupprimés;
+	}
+
+	/**
+	 * @param fichiersSupprimés
+	 */
+	public void setFichiersSupprimés(ArrayList<String> fichiersSupprimés) {
+		this.fichiersSupprimés = fichiersSupprimés;
 	}
 
 }
