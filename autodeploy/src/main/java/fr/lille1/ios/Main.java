@@ -5,7 +5,7 @@ import fr.lille1.ios.lib.Server;
 public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		// Créer le worker
-		Server server = new Server("c://temp//");
+		Server server = new Server("/local/six/projects/workspaceIOS/bundles_a_deployer");
 		// Créer le thred
 		Thread folderSpyThread = new Thread(server);
 		// Lancer le thread
