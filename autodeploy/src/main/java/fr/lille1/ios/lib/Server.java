@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.osgi.framework.BundleContext;
+
 /**
  * @author six
  *
@@ -57,13 +59,13 @@ public class Server implements Runnable {
 					String fileName = event.context().toString();
 					System.out.println(fileName);
 					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-						nouveauxFichiers.add(this.path+fileName);
+						nouveauxFichiers.add(this.path + fileName);
 						System.out.println("new file create " + fileName);
 					} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
 						System.out.println(fileName + " has been modified");
 					} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
 						System.out.println(fileName + " has been deleted");
-						fichiersSupprimés.add(this.path+fileName);
+						fichiersSupprimés.add(this.path + fileName);
 					} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 						System.out.println("Strange event");
 						continue;
