@@ -48,11 +48,15 @@ public class Server implements Runnable {
 
 			WatchKey watchKey;
 
+			// TODO : au demarrage checker tous les fichiers déjà présent dans le répertoire
+			// et les update
+
 			while (!Thread.interrupted()) {
 				watchKey = service.take();
 
 				// traiter les evenements
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
+					// TODO verifier si le fichier fini par .jar avec la fonction .endwith(".jar")
 					String fileName = event.context().toString();
 					// System.out.println(fileName);
 					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
@@ -62,8 +66,12 @@ public class Server implements Runnable {
 						this.context.getBundle(file.toURI().toURL().toString()).start();
 					} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
 						System.out.println(fileName + " has been modified");
+						// TODO : update
 					} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
 						System.out.println(fileName + " has been deleted");
+						// TODO : desinstallation
+						File file = new File(this.path + "/" + fileName);
+						this.context.getBundle(file.toURI().toURL().toString()).uninstall();
 					} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 						System.out.println("Strange event");
 						continue;
