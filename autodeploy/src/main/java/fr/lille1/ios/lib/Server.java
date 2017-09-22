@@ -48,7 +48,8 @@ public class Server implements Runnable {
 					StandardWatchEventKinds.ENTRY_DELETE);
 
 			// TODO : au demarrage checker tous les fichiers déjà présent dans le répertoire
-			// et les update
+			// et les update => piste : si bundle = null avec le nom de fichier alors on install 
+			// this.context.getBundle(file.toURI().toURL().toString()) == Null => install
 //
 //			File dossier = new File(this.path.toString());
 //			File[] fichiersDejaPresent = dossier.listFiles();
