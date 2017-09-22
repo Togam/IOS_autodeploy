@@ -1,7 +1,8 @@
 package fr.lille1.ios;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -14,23 +15,29 @@ import fr.lille1.ios.lib.Server;
  */
 public class Activator implements BundleActivator {
 
-	Server server = new Server("/local/six/projects/workspaceIOS/bundles_a_deployer");
-	Thread folderSpyThread = new Thread(server);
+	Server server = null;
+	Thread folderSpyThread = null;
+	List<String> files = new ArrayList<String>();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
+		this.server = new Server(Paths.get("/local/six/projects/workspaceIOS/bundles_a_deployer"), context);
+		folderSpyThread = new Thread(server);
 		folderSpyThread.start();
-		ArrayList<String> nvxFichier = this.server.getNouveauxFichiers();
-		for (String nameFile : nvxFichier) {
-			File file = new File(nameFile);
-			context.installBundle(file.toURI().toURL().toString());
-		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
-		// Patienter 30 secondes
-		Thread.sleep(30000);
-		// Fermer le Thread
 		folderSpyThread.interrupt();
 	}
-
 }

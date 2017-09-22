@@ -1,13 +1,12 @@
 package fr.lille1.ios.lib;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,8 +19,7 @@ import org.osgi.framework.BundleContext;
 public class Server implements Runnable {
 
 	private Path path = null;
-	ArrayList<String> nouveauxFichiers;
-	ArrayList<String> fichiersSupprimés;
+	private BundleContext context;
 
 	/**
 	 * Constructeur
@@ -29,11 +27,10 @@ public class Server implements Runnable {
 	 * @param pathfolder
 	 *            path du dossier à espionner
 	 */
-	public Server(String pathfolder) {
-		this.path = Paths.get(pathfolder);
+	public Server(Path pathfolder, BundleContext context) {
+		this.path = pathfolder;
+		this.context = context;
 		System.out.println("Dossier " + pathfolder + " espionné : start");
-		this.nouveauxFichiers = new ArrayList<String>();
-		this.fichiersSupprimés = new ArrayList<String>();
 	}
 
 	/*
@@ -57,15 +54,16 @@ public class Server implements Runnable {
 				// traiter les evenements
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
 					String fileName = event.context().toString();
-					System.out.println(fileName);
+					// System.out.println(fileName);
 					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-						nouveauxFichiers.add(this.path + fileName);
 						System.out.println("new file create " + fileName);
+						File file = new File(this.path + "/" + fileName);
+						this.context.installBundle(file.toURI().toURL().toString());
+						this.context.getBundle(file.toURI().toURL().toString()).start();
 					} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
 						System.out.println(fileName + " has been modified");
 					} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
 						System.out.println(fileName + " has been deleted");
-						fichiersSupprimés.add(this.path + fileName);
 					} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 						System.out.println("Strange event");
 						continue;
@@ -104,29 +102,15 @@ public class Server implements Runnable {
 	/**
 	 * @return
 	 */
-	public ArrayList<String> getNouveauxFichiers() {
-		return nouveauxFichiers;
+	public BundleContext getContext() {
+		return context;
 	}
 
 	/**
-	 * @param nouveauxFichiers
+	 * @param context
 	 */
-	public void setNouveauxFichiers(ArrayList<String> nouveauxFichiers) {
-		this.nouveauxFichiers = nouveauxFichiers;
-	}
-
-	/**
-	 * @return
-	 */
-	public ArrayList<String> getFichiersSupprimés() {
-		return fichiersSupprimés;
-	}
-
-	/**
-	 * @param fichiersSupprimés
-	 */
-	public void setFichiersSupprimés(ArrayList<String> fichiersSupprimés) {
-		this.fichiersSupprimés = fichiersSupprimés;
+	public void setContext(BundleContext context) {
+		this.context = context;
 	}
 
 }
