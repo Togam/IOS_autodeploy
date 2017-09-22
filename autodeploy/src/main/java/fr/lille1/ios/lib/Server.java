@@ -56,25 +56,26 @@ public class Server implements Runnable {
 
 				// traiter les evenements
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
-					// TODO verifier si le fichier fini par .jar avec la fonction .endwith(".jar")
 					String fileName = event.context().toString();
-					// System.out.println(fileName);
-					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-						System.out.println("new file create " + fileName);
-						File file = new File(this.path + "/" + fileName);
-						this.context.installBundle(file.toURI().toURL().toString());
-						this.context.getBundle(file.toURI().toURL().toString()).start();
-					} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
-						System.out.println(fileName + " has been modified");
-						// TODO : update
-					} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
-						System.out.println(fileName + " has been deleted");
-						// TODO : desinstallation
-						File file = new File(this.path + "/" + fileName);
-						this.context.getBundle(file.toURI().toURL().toString()).uninstall();
-					} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
-						System.out.println("Strange event");
-						continue;
+					if (fileName.endsWith(".jar")) {
+						// System.out.println(fileName);
+						if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+							System.out.println("new file create " + fileName);
+							File file = new File(this.path + "/" + fileName);
+							this.context.installBundle(file.toURI().toURL().toString());
+							this.context.getBundle(file.toURI().toURL().toString()).start();
+						} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
+							System.out.println(fileName + " has been modified");
+							// TODO : update
+						} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
+							System.out.println(fileName + " has been deleted");
+							// TODO : desinstallation
+							File file = new File(this.path + "/" + fileName);
+							this.context.getBundle(file.toURI().toURL().toString()).uninstall();
+						} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
+							System.out.println("Strange event");
+							continue;
+						}
 					}
 				}
 				// se place en attente de message
