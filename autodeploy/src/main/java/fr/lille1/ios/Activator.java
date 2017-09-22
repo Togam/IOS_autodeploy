@@ -16,7 +16,7 @@ import fr.lille1.ios.lib.Server;
 public class Activator implements BundleActivator {
 
 	Server server = null;
-	Thread folderSpyThread = null;
+	Thread threadEspion = null;
 	List<String> files = new ArrayList<String>();
 
 	/*
@@ -27,8 +27,8 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		this.server = new Server(Paths.get("/local/six/projects/workspaceIOS/bundles_a_deployer"), context);
-		folderSpyThread = new Thread(server);
-		folderSpyThread.start();
+		threadEspion = new Thread(server);
+		threadEspion.start();
 	}
 
 	/*
@@ -38,6 +38,6 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		folderSpyThread.interrupt();
+		threadEspion.interrupt();
 	}
 }

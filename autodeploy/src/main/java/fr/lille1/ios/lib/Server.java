@@ -46,29 +46,37 @@ public class Server implements Runnable {
 			this.path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
 					StandardWatchEventKinds.ENTRY_DELETE);
 
-			WatchKey watchKey;
-
 			// TODO : au demarrage checker tous les fichiers déjà présent dans le répertoire
 			// et les update
+
+			WatchKey watchKey;
 
 			while (!Thread.interrupted()) {
 				watchKey = service.take();
 
 				// traiter les evenements
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
+
 					String fileName = event.context().toString();
+
+					// Vérifie que le fichier sur lequel il y a un evenement est un .jar, sinon il
+					// ne fera rien
 					if (fileName.endsWith(".jar")) {
 						File file = new File(this.path + "/" + fileName);
+
 						if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-							System.out.println("new file create " + fileName);
+							System.out.println("nouveau fichier : " + fileName);
 							this.context.installBundle(file.toURI().toURL().toString());
 							this.context.getBundle(file.toURI().toURL().toString()).start();
+
 						} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
-							System.out.println(fileName + " has been modified");
-							// TODO : update
+							System.out.println(fileName + " a été modifié");
+							this.context.getBundle(file.toURI().toURL().toString()).update();
+
 						} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
-							System.out.println(fileName + " has been deleted");
+							System.out.println(fileName + " a été supprimé");
 							this.context.getBundle(file.toURI().toURL().toString()).uninstall();
+
 						} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 							System.out.println("Strange event");
 							continue;
@@ -82,7 +90,7 @@ public class Server implements Runnable {
 			try {
 				if (service != null)
 					service.close();
-				System.out.println("Stop FolderSpy");
+				System.out.println("Arrêt de l'espionnage du dossier");
 			} catch (IOException ex1) {
 				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex1);
 			}
