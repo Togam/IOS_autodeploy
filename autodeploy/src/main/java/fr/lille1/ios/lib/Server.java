@@ -58,10 +58,9 @@ public class Server implements Runnable {
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
 					String fileName = event.context().toString();
 					if (fileName.endsWith(".jar")) {
-						// System.out.println(fileName);
+						File file = new File(this.path + "/" + fileName);
 						if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
 							System.out.println("new file create " + fileName);
-							File file = new File(this.path + "/" + fileName);
 							this.context.installBundle(file.toURI().toURL().toString());
 							this.context.getBundle(file.toURI().toURL().toString()).start();
 						} else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
@@ -69,8 +68,6 @@ public class Server implements Runnable {
 							// TODO : update
 						} else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
 							System.out.println(fileName + " has been deleted");
-							// TODO : desinstallation
-							File file = new File(this.path + "/" + fileName);
 							this.context.getBundle(file.toURI().toURL().toString()).uninstall();
 						} else if (StandardWatchEventKinds.OVERFLOW.equals(event.kind())) {
 							System.out.println("Strange event");
