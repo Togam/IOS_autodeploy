@@ -10,6 +10,7 @@ import java.nio.file.WatchService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -48,6 +49,16 @@ public class Server implements Runnable {
 
 			// TODO : au demarrage checker tous les fichiers déjà présent dans le répertoire
 			// et les update
+//
+//			File dossier = new File(this.path.toString());
+//			File[] fichiersDejaPresent = dossier.listFiles();
+//			Bundle[] bundleInstalles = this.context.getBundles();
+//
+//			for (int i = 0; i < fichiersDejaPresent.length; i++) {
+//				
+//				
+//			}
+			// this.context.getBundles() ??
 
 			WatchKey watchKey;
 
