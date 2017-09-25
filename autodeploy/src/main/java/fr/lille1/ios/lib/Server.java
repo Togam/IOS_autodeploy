@@ -10,12 +10,13 @@ import java.nio.file.WatchService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
  * @author six
  *
+ *         Classe permettant de surveiller un dossier et qui déploie
+ *         automatiquement les programmes ajoutés à ce dossier
  */
 public class Server implements Runnable {
 
@@ -47,19 +48,17 @@ public class Server implements Runnable {
 			this.path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
 					StandardWatchEventKinds.ENTRY_DELETE);
 
-			// TODO : au demarrage checker tous les fichiers déjà présent dans le répertoire
-			// et les update => piste : si bundle = null avec le nom de fichier alors on install 
-			// this.context.getBundle(file.toURI().toURL().toString()) == Null => install
-//
-//			File dossier = new File(this.path.toString());
-//			File[] fichiersDejaPresent = dossier.listFiles();
-//			Bundle[] bundleInstalles = this.context.getBundles();
-//
-//			for (int i = 0; i < fichiersDejaPresent.length; i++) {
-//				
-//				
-//			}
-			// this.context.getBundles() ??
+			// S'il y a des fichiers déjà présents mais qui ne sont pas installés, on les
+			// installe
+			File dossier = new File(this.path.toString());
+			File[] fichiersDejaPresent = dossier.listFiles();
+
+			for (int i = 0; i < fichiersDejaPresent.length; i++) {
+				if (this.context.getBundle(fichiersDejaPresent[i].toURI().toURL().toString()) == null) {
+					this.context.installBundle(fichiersDejaPresent[i].toURI().toURL().toString());
+					this.context.getBundle(fichiersDejaPresent[i].toURI().toURL().toString()).start();
+				}
+			}
 
 			WatchKey watchKey;
 
